@@ -1,0 +1,83 @@
+---
+- mysql_db: login_host=localhost name={{ q2a_dbname }} state=present encoding=utf8
+- mysql_user: login_host=localhost user={{ q2a_dbuser }} password={{ q2a_dbuser }} priv="{{ q2a_dbname }}.*:all"
+
+- git:
+    repo: 'https://github.com/q2a/question2answer.git'
+    dest: "{{ q2a_document_root }}"
+  sudo_user: "{{ httpd_user }}"
+
+- shell: mv 'qa-config-example.php' 'qa-config.php'
+  args:
+    chdir: "{{ q2a_document_root }}"
+    creates: 'qa-config.php'
+
+- lineinfile:
+  args:
+    dest: "{{ q2a_document_root }}/qa-config.php"
+    regexp: "^\\s*define.'QA_MYSQL_USERNAME', '.*'."
+    line: "    define('QA_MYSQL_USERNAME', '{{ q2a_dbuser }}');"
+- lineinfile:
+  args:
+    dest: "{{ q2a_document_root }}/qa-config.php"
+    regexp: "^\\s*define.'QA_MYSQL_PASSWORD', '.*'."
+    line: "    define('QA_MYSQL_PASSWORD', '{{ q2a_dbuser }}');"
+- lineinfile:
+  args:
+    dest: "{{ q2a_document_root }}/qa-config.php"
+    regexp: "^\\s*define.'QA_MYSQL_DATABASE', '.*'."
+    line: "    define('QA_MYSQL_DATABASE', '{{ q2a_dbname }}');"
+
+- shell: wget --trust-server-names http://cmsbox.jp/archive/download.php\?t\=d\&i\=33; unzip q2a-fuw-v121.zip;mv q2-fuw-v121.zip; mv q2a-fuw-v121 fuw-v121; rm -f q2a-fuw-v121.zip
+  sudo_user: "{{ httpd_user }}"
+  args:
+    chdir: "{{ q2a_plugin_dir }}"
+    creates: "{{ q2a_plugin_dir }}/fuw-v121"
+
+- get_url: url=http://blog.palcolle.com/q2a-161-p2-lang-ja.zip dest="{{ q2a_lang_dir }}/q2a-161-p2-lang-ja.zip"
+  sudo_user: "{{ httpd_user }}"
+- shell: unzip "{{ q2a_lang_dir }}/q2a-161-p2-lang-ja.zip"
+  sudo_user: "{{ httpd_user }}"
+  args:
+    chdir: "{{ q2a_lang_dir }}"
+    creates: "{{ q2a_lang_dir }}/q2a-161-p2-lang-ja"
+- shell: mv "{{ q2a_lang_dir }}/q2a-161-p2-lang-ja/ja" "{{ q2a_lang_dir }}/"
+  sudo_user: "{{ httpd_user }}"
+  args:
+    chdir: "{{ q2a_lang_dir }}"
+    creates: "{{ q2a_lang_dir }}/ja"
+
+- get_url: url=http://cmsbox.jp/archive/download.php\?t\=f\&i\=126  dest="{{ q2a_plugin_dir }}/q2a-juf.zip"
+  sudo_user: "{{ httpd_user }}"
+- file: path={{ q2a_plugin_dir }}/q2a-juf-v10 state=absent recurse=yes
+- shell: unzip "q2a-juf.zip"
+  sudo_user: "{{ httpd_user }}"
+  args:
+    chdir: "{{ q2a_plugin_dir }}"
+
+- git: repo={{ item.repo }} dest={{ item.dest }}
+  sudo_user: "{{ httpd_user }}"
+  with_items:
+    - repo: "https://github.com/NoahY/q2a-poll.git"
+      dest: "{{ q2a_plugin_dir }}/q2a-poll"
+    - repo: "https://github.com/NoahY/q2a-wiki.git"
+      dest: "{{ q2a_plugin_dir }}/q2a-wiki"
+    - repo: "https://github.com/NoahY/q2a-comment-ajax.git"
+      dest: "{{ q2a_plugin_dir }}/comment-ajax"
+    - repo: "https://github.com/NoahY/q2a-confirm.git"
+      dest: "{{ q2a_plugin_dir }}/confirm"
+    - repo: "https://github.com/q2apro/q2apro-best-users-per-month-free.git"
+      dest: "{{ q2a_plugin_dir }}/best-users-per-month"
+    - repo: "https://github.com/NoahY/q2a-comment-voting.git"
+      dest: "{{ q2a_plugin_dir }}/comment-voting"
+    # - repo: "https://github.com/NoahY/q2a-theme-switcher.git"
+      # dest: "{{ q2a_plugin_dir }}/theme-switcher"
+    - repo: "https://github.com/alixandru/q2a-open-login.git"
+      dest: "{{ q2a_plugin_dir }}/open-login"
+
+- shell: mv "providers-sample.php" "providers.php"; chmod g+w "providers.php"
+  sudo_user: "{{ httpd_user }}"
+  args:
+    chdir: "{{ q2a_plugin_dir }}/open-login"
+    creates: "{{ q2a_plugin_dir }}/open-login/providers.php"
+

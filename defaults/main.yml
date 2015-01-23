@@ -1,0 +1,12 @@
+---
+q2a_document_root: "/home/q2a/public_html"
+httpd_user: apache
+
+q2a_dbhost: localhost
+q2a_dbname: "q2a_db"
+q2a_dbuser: "q2a_user"
+q2a_dbpass: "{{ q2a_dbuser }}"
+
+q2a_plugin_dir: "{{ q2a_document_root }}/qa-plugin"
+q2a_theme_dir: "{{ q2a_document_root }}/qa-theme"
+q2a_lang_dir: "{{ q2a_document_root }}/qa-lang"
