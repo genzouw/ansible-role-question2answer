@@ -49,7 +49,7 @@
 
 - get_url: url=http://cmsbox.jp/archive/download.php\?t\=f\&i\=126  dest="{{ q2a_plugin_dir }}/q2a-juf.zip"
   sudo_user: "{{ httpd_user }}"
-- file: path={{ q2a_plugin_dir }}/q2a-juf-v10 state=absent recurse=yes
+- file: path={{ q2a_plugin_dir }}/q2a-juf-v10 state=absent
 - shell: unzip "q2a-juf.zip"
   sudo_user: "{{ httpd_user }}"
   args:
