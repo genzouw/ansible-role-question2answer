@@ -1,6 +1,6 @@
 ---
-- mysql_db: login_host=localhost name={{ q2a_dbname }} state=present encoding=utf8
-- mysql_user: login_host=localhost user={{ q2a_dbuser }} password={{ q2a_dbuser }} priv="{{ q2a_dbname }}.*:all"
+- mysql_db: login_host={{ q2a_dbhost }} name={{ q2a_dbname }} state=present encoding=utf8
+- mysql_user: login_host={{ q2a_dbhost }} user={{ q2a_dbuser }} password={{ q2a_dbuser }} priv="{{ q2a_dbname }}.*:all"
 
 - git:
     repo: 'https://github.com/q2a/question2answer.git'
